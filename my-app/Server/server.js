@@ -47,6 +47,35 @@ app.post('/getRecordsByUser', (req, res) => {
 
 });
 
+app.post('/getDetailsByUser', (req, res) => {
+
+  const MongoClient = require('mongodb').MongoClient;//创建服务器实例
+  const uri = "mongodb+srv://lanmiemie:zly3885251@mobiledata.ez0ez.mongodb.net/MobileData?retryWrites=true&w=majority";
+  
+  let data = Object.keys(req.body)[0];
+
+  let persons = JSON.parse(data)['persons']//和userembvis中的selected_persons_dict是一样的
+
+  MongoClient.connect(uri, { useNewUrlParser: true }).then((conn) => {    //与网上的mongdb服务器连接
+
+      let fake_person = '18608151703'
+
+      const db = conn.db("cotton");//创建数据库的实例
+      // 增加
+      db.collection("person_seq").find({'person': fake_person}).toArray().then((arr) => {
+    
+          res.status(200).send(JSON.stringify(arr))
+
+      }).catch((err) => {
+        console.log(err);
+      });
+
+  }).catch((err) => {
+      console.log(err);
+    });
+
+});
+
 const server = app.listen(4001, function () {
 
   const host = 'server.address().address'

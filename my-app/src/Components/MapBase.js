@@ -114,9 +114,9 @@ class MapBase extends React.Component {
  
         }
 
-        console.log(points)
-
         var clusters = dbscan.run(points, 10, 2);
+
+        DataProvider.clusters = clusters
 
         let ccList = []
 

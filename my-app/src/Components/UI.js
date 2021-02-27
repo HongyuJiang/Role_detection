@@ -20,6 +20,15 @@ class UI extends React.Component {
                 
                 PubSub.publish('send-data', JSON.parse(data));
         });
+
+        $.post('http://localhost:4001/getDetailsByUser/', JSON.stringify(
+            {'persons': person_dict}))
+               .done(function( data ) {
+
+                console.log(JSON.parse(data))
+                
+                //PubSub.publish('send-data', JSON.parse(data));
+        });
       }
 
     componentDidMount() {
