@@ -29,7 +29,7 @@ app.post('/getRecordsByUser', (req, res) => {
 
       const db = conn.db("cotton");//创建数据库的实例
       // 增加
-      db.collection("heihei").find({}, {fields: persons}).toArray().then((arr) => {
+      db.collection("miao").find({}, {fields: persons}).toArray().then((arr) => {
 
           ret_data = arr[0]
           //console.log("ret_data",ret_data)
@@ -58,7 +58,7 @@ app.post('/getDetailsByUser', (req, res) => {
 
   MongoClient.connect(uri, { useNewUrlParser: true }).then((conn) => {    //与网上的mongdb服务器连接
 
-      let fake_person = '18608151703'
+      let fake_person = '18608080118'
 
       const db = conn.db("cotton");//创建数据库的实例
       // 增加
@@ -84,3 +84,7 @@ const server = app.listen(4001, function () {
   console.log("Example app listening at http://%s:%s", host, port)
 
 })
+
+
+//mongoimport --uri "mongodb+srv://lanmiemie:zly3885251@mobiledata.ez0ez.mongodb.net/MobileData?ssl=true&replicaSet=myAtlasRS&authSource=admin" --collection miao --drop --file /somedir/myFileToImport.json
+

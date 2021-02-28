@@ -19,26 +19,37 @@ class UI extends React.Component {
                .done(function( data ) {
                 
                 PubSub.publish('send-data', JSON.parse(data));
-        });
 
-        $.post('http://localhost:4001/getDetailsByUser/', JSON.stringify(
-            {'persons': person_dict}))
-               .done(function( data ) {
+                if(this.detailData == undefined){
 
-                console.log(JSON.parse(data))
+                    $.post('http://localhost:4001/getDetailsByUser/', JSON.stringify(
+                    {'persons': person_dict}))
+                    .done(function( data ) {
+
+                        PubSub.publish('details-data', JSON.parse(data));
+                        this.detailData = JSON.parse(data)
+                    });
+
+                }
+                else{
+
+                    PubSub.publish('details-data', this.detailData);
+                }
                 
-                //PubSub.publish('send-data', JSON.parse(data));
         });
+
+        
       }
 
     componentDidMount() {
         
+        d3.selectAll('.mapboxgl-ctrl').remove()
     }
 
     render() {
         return (
-            <div style={{zIndex:'9999'}}>
-                <input id='userInput' value='13035631411'/>
+            <div style={{zIndex:'9999', left:'10px', top:'10px', position:'absolute'}}>
+                <input id='userInput' value='18608080118'/>
                 <button onClick={this.userRecordsQuery} >Query</button>
             </div>
         )

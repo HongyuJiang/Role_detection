@@ -29,6 +29,8 @@ class CellCard extends React.Component {
 
         let cell_list = []
 
+        let sum_max = 0, sum_min = 100000
+
         for(let cell in cells){
 
             let times = Object.keys(cells[cell])
@@ -39,15 +41,28 @@ class CellCard extends React.Component {
 
             cells[cell]['sum'] = sum
 
+            times.forEach(t => {
+
+                let v = cells[cell][t]
+
+                if(v > sum_max) sum_max = v
+                if(v < sum_min) sum_min = v
+            })
+
+        
             if (DataProvider.cell_info[cell] != undefined)
                 cell_list.push({'name': DataProvider.cell_info[cell].name, 'his': cells[cell]})
             else
                 cell_list.push({'name': cell, 'his': cells[cell]})
         }
 
+        let sumScale = d3.scaleLinear().domain([sum_min, sum_max]).range([0, 75])
+
         let width = 300
 
         let height = window.innerHeight
+
+        d3.select('#cardContainer').selectAll('*').remove()
 
         let canvas = d3.select('#cardContainer').append('svg')
         .attr('width', width)
@@ -83,9 +98,9 @@ class CellCard extends React.Component {
         .enter()
         .append('rect')
         .attr('x', (d, i) => {return d.t * 10})
-        .attr('y', d => 75 - d.value * 10)
+        .attr('y', d => 75 - sumScale(d.value))
         .attr('width', 8)
-        .attr('height', d => d.value * 10)
+        .attr('height', d => sumScale(d.value))
         .attr('fill', 'steelblue')
         .attr('opacity', 0.7)
 
@@ -97,7 +112,8 @@ class CellCard extends React.Component {
 
     render() {
         return (
-            <div id='cardContainer' style={{background:'rgba(255,255,255,0.9)', right:'0', position:'absolute', width:'300px', zIndex:'999', height:'100%'}}>
+            <div id='cardContainer' style={{background:'rgba(255,255,255,0.9)', right:'0', position:'absolute', width:'300px', zIndex:'999', height:'70%', top:'20px', maxHeight: '1620px',
+            overflowY: 'auto'}}>
                 
             </div>
         )

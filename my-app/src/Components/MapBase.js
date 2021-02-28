@@ -64,9 +64,9 @@ class MapBase extends React.Component {
                 type: "circle",
                 source: "cells",
                 paint: {
-                    "circle-radius": 5,
+                    "circle-radius": 2,
                     "circle-color": "#666",
-                    "circle-stroke-width": 2,
+                    "circle-stroke-width": 1,
                     "circle-stroke-color": "#fff",
                 },
                 //minzoom: 10,
@@ -99,7 +99,7 @@ class MapBase extends React.Component {
 
         let points = []
 
-        console.log(cells)
+        let names = []
 
         for (let cell in cells){
 
@@ -110,23 +110,31 @@ class MapBase extends React.Component {
                 var p = this.map.project(new mapboxgl.LngLat(info.lon, info.lat))
 
                 points.push([p.x, p.y])
+                names.push(cell)
             }
  
         }
 
-        var clusters = dbscan.run(points, 10, 2);
+        let cluster_with_id = []
 
-        DataProvider.clusters = clusters
+        var clusters = dbscan.run(points, 10, 2);
 
         let ccList = []
 
         clusters.forEach(cluster => {
 
             let pp = []
+
+            let nodes = []
+
             cluster.forEach(c => {
 
                 pp.push({'x': points[c][0], 'y': points[c][1]})
+                nodes.push(names[c])
+
             })
+
+            cluster_with_id.push(nodes)
 
             var cc = minimumCircle().data(pp)
 
@@ -148,6 +156,8 @@ class MapBase extends React.Component {
             }
 
         })
+
+        DataProvider.clusters = cluster_with_id
 
         if (this.map.getSource("mCircles") != null) {
             this.map.getSource("mCircles").setData({
@@ -171,7 +181,7 @@ class MapBase extends React.Component {
                     "circle-radius": { "type": "identity", "property": "radius" },
                     "circle-stroke-width": 2,
                     "circle-opacity": 0,
-                    "circle-stroke-color": "#f00",
+                    "circle-stroke-color": "#333",
                 },
                 //minzoom: 10,
             });
@@ -203,12 +213,15 @@ class MapBase extends React.Component {
 
             this.cells = data[user]
 
+            this.CalculateCluster(this.cells)
+
         })
 
         this.map.on('moveend', d => {
 
             if(this.cells != undefined)
                 that.CalculateCluster(this.cells)
+                
         })
     }
 
