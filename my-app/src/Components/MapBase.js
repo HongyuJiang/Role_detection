@@ -221,6 +221,9 @@ class MapBase extends React.Component {
 
             if(this.cells != undefined)
                 that.CalculateCluster(this.cells)
+
+            if(DataProvider.detailData != undefined)
+                PubSub.publish('details-data', DataProvider.detailData);
                 
         })
     }

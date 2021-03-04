@@ -20,6 +20,7 @@ class CellCard extends React.Component {
             let cell_finger = data[user]
 
             that.drawCards(cell_finger)
+            
 
         })
         
@@ -56,20 +57,24 @@ class CellCard extends React.Component {
                 cell_list.push({'name': cell, 'his': cells[cell]})
         }
 
+        cell_list = cell_list.sort((a,b) => {return b.his.sum - a.his.sum})
+
         let sumScale = d3.scaleLinear().domain([sum_min, sum_max]).range([0, 75])
 
         let width = 300
 
-        let height = window.innerHeight
+        let shown_cell_list = cell_list.filter(d => d.his.sum > 10)
+
+        let canvas_height = shown_cell_list.length * 80 + 15
 
         d3.select('#cardContainer').selectAll('*').remove()
 
         let canvas = d3.select('#cardContainer').append('svg')
         .attr('width', width)
-        .attr('height', height)
+        .attr('height', canvas_height)
 
         let cards = canvas.selectAll('.card')
-        .data(cell_list.filter(d => d.his.sum > 10))
+        .data(shown_cell_list)
         .enter()
         .append('g')
         .attr('transform', 'translate(0,0)')

@@ -2,6 +2,7 @@ import React from 'react';
 import * as d3 from 'd3';
 import $ from "jquery";
 import PubSub from 'pubsub-js'
+import DataProvider from "./DataProvider";
 
 class UI extends React.Component {
     constructor(props) {
@@ -28,6 +29,7 @@ class UI extends React.Component {
 
                         PubSub.publish('details-data', JSON.parse(data));
                         this.detailData = JSON.parse(data)
+                        DataProvider.detailData = this.detailData
                     });
 
                 }
