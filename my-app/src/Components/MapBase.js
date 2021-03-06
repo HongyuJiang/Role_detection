@@ -4,6 +4,7 @@ import DataProvider from "./DataProvider";
 import PubSub from 'pubsub-js'
 import * as DC from 'density-clustering';
 import minimumCircle from './minimumCircle'
+import * as d3 from 'd3';
 
 mapboxgl.accessToken = 'pk.eyJ1IjoiaG9uZ3l1amlhbmciLCJhIjoiY2tnajVvNTZiMGE5YTJ3bmZ4bTkwZ2FzeSJ9.Jn2qkNB2GcQUdbaSQTaGuQ';
 
@@ -117,7 +118,7 @@ class MapBase extends React.Component {
 
         let cluster_with_id = []
 
-        var clusters = dbscan.run(points, 10, 2);
+        var clusters = dbscan.run(points, 15, 2);
 
         let ccList = []
 
@@ -142,22 +143,24 @@ class MapBase extends React.Component {
 
             var p = this.map.unproject(ccData)
 
-            if(ccData.r >= 0){
+            //if(ccData.r >= 0){
+            let meta = {};
+            meta["properties"] = {};
+            meta["properties"]['radius'] = ccData.r + 3;
+            meta["properties"]['color'] = d3.schemeSet2[cluster_with_id.length - 1]
+            meta["type"] = "Feature";
+            meta["geometry"] = {};
+            meta["geometry"]["type"] = "Point";
+            meta["geometry"]["coordinates"] = [p.lng, p.lat];
 
-                let meta = {};
-                meta["properties"] = {};
-                meta["properties"]['radius'] = ccData.r + 5;
-                meta["type"] = "Feature";
-                meta["geometry"] = {};
-                meta["geometry"]["type"] = "Point";
-                meta["geometry"]["coordinates"] = [p.lng, p.lat];
-
-                ccList.push(meta)
-            }
+            ccList.push(meta)
+            //}
 
         })
 
         DataProvider.clusters = cluster_with_id
+
+     //let cluster_IDs = Array.from(new Array(cluster_with_id.length + 1).keys()).slice(1)
 
         if (this.map.getSource("mCircles") != null) {
             this.map.getSource("mCircles").setData({
@@ -181,7 +184,7 @@ class MapBase extends React.Component {
                     "circle-radius": { "type": "identity", "property": "radius" },
                     "circle-stroke-width": 2,
                     "circle-opacity": 0,
-                    "circle-stroke-color": "#333",
+                    "circle-stroke-color": { "type": "identity", "property": "color" },
                 },
                 //minzoom: 10,
             });
