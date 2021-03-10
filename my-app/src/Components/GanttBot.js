@@ -134,10 +134,10 @@ class GanttBot extends React.Component {
         .enter()
         .append('text')
         .attr('fill', 'black')
-        .attr('x', d => xScale(d.bt) + 20)
+        .attr('x', d => xScale(d.bt) + 35)
         .attr('y', 180)
         .attr('opacity', 1)
-        .attr('font-size', 10)
+        .attr('font-size', 16)
         .text(d => weekdays[d.bt.getDay()])
 
         canvas.append('g').selectAll('.event_line')

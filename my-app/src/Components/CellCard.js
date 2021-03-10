@@ -106,8 +106,8 @@ class CellCard extends React.Component {
         .attr('y', d => 75 - sumScale(d.value))
         .attr('width', 8)
         .attr('height', d => sumScale(d.value))
-        .attr('fill', 'steelblue')
-        .attr('opacity', 0.7)
+        .attr('fill', 'black')
+        .attr('opacity', 0.6)
 
         cards.transition().duration(1200).attr('transform', (d,i) => {
             return 'translate(0,' + (10 + i * 80) + ')'
@@ -117,7 +117,7 @@ class CellCard extends React.Component {
 
     render() {
         return (
-            <div id='cardContainer' style={{background:'rgba(255,255,255,0.9)', right:'0', position:'absolute', width:'300px', zIndex:'999', height:'70%', top:'20px', maxHeight: '1620px',
+            <div id='cardContainer' style={{background:'rgba(255,255,255,0.9)', right:'0', position:'absolute', width:'320px', zIndex:'999', height:'70%', top:'20px', maxHeight: '1620px',
             overflowY: 'auto'}}>
                 
             </div>

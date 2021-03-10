@@ -30,10 +30,9 @@ class SocialGraph extends React.Component {
 
         d3.select('#graphContainer').selectAll('*').remove()
 
-        let canvas = d3.select('#cardContainer').append('svg')
+        let canvas = d3.select('#graphContainer').append('svg')
         .attr('width', width)
         .attr('height', canvas_height)
-
 
     }
 

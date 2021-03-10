@@ -3,6 +3,7 @@ import MapBase from './Components/MapBase';
 import UI from './Components/UI';
 import CellCard from './Components/CellCard';
 import GanttBot from './Components/GanttBot';
+import ClusterView from './Components/ClusterView';
 
 function App() {
   return (
@@ -12,6 +13,7 @@ function App() {
         <UI />
         <CellCard />
         <GanttBot />
+        <ClusterView />
       </header>
     </div>
   );
