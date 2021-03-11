@@ -22,6 +22,40 @@ class ClusterView extends React.Component {
 
     }
 
+    drawUsers(svg, persons){
+
+        persons = persons.splice(0,20)
+
+        let userContainer = svg.append('g').attr('id', 'userContainer')
+        let person_num = persons.length
+        let R = window.innerHeight / 4
+        var pi = Math.PI;
+        let startAngle = 30 * (pi/180);
+        let endAngle = 150 * (pi/180);
+        
+        userContainer.attr('transform', d => 'translate(' + (R * 0.7) + ',' + R + ')')
+
+        let angleScale = d3.scaleLinear().domain([0, person_num]).range([startAngle, endAngle])
+
+        userContainer.selectAll('.userDot')
+        .data(persons)
+        .enter()
+        .append('circle')
+        .attr('r', 3)
+        .attr('cx', (d,i) => R * Math.sin(angleScale(i)))
+        .attr('cy', (d,i) => R * Math.cos(angleScale(i)))
+        .attr('fill', 'steelblue')
+
+        userContainer.selectAll('.userName')
+        .data(persons)
+        .enter()
+        .append('text')
+        .attr('x', (d,i) => R * Math.sin(angleScale(i)) + 5)
+        .attr('y', (d,i) => R * Math.cos(angleScale(i)) + 5)
+        .text( d => '#' + d.slice(7, 11) )
+        .attr('font-size', 11)
+    }
+
     drawBackGround(svg, width, height) {
 
         svg.append('circle')
@@ -30,6 +64,10 @@ class ClusterView extends React.Component {
             .attr('opacity', 0.1)
             .attr('cx', width / 2)
             .attr('cy', height / 2)
+            .on('click', d => {
+
+                
+            })
 
         svg.append('g')
             .attr('transform', 'translate(' + width / 2 + ',' + (height / 2) + ')')
@@ -68,6 +106,7 @@ class ClusterView extends React.Component {
         let height = window.innerHeight / 2
 
         let width = height
+        let that = this
 
         let zoom_lambda = width / 200
 
@@ -85,7 +124,7 @@ class ClusterView extends React.Component {
         let selecting = false
         let selected_persons = []
 
-        svg.selectAll('points')
+        svg.append('g').selectAll('points')
             .data(data)
             .enter()
             .append('circle')
@@ -135,17 +174,11 @@ class ClusterView extends React.Component {
 
                             if (dis <= 25) {
 
-                                if (d3.select(this).attr('selected') != 1) {
-                                    
-                                    d3.select(this).attr('selected', 1)
-                                    let person = d3.select(this).attr('person')
-                                    selected_persons.push(person)//selected_persons中为选中的person
-                                    return 'red'
-                                }
-                                else{
-                                    return 'red'
-                                }
-                      
+                                d3.select(this).attr('selected', 1)
+                                let person = d3.select(this).attr('person')
+                                selected_persons.push(person)//selected_persons中为选中的person
+                                return 'red'
+                               
                             }
 
                         })
@@ -155,14 +188,28 @@ class ClusterView extends React.Component {
 
             .on('mouseup', function (d) {
 
+                if (selected_persons.length == 0){
+
+                    d3.select('#userContainer').remove()
+
+                    d3.selectAll('.point')
+                    .attr('fill', 'black')
+
+                }
+                else{
+
+                    d3.selectAll('.point')
+                    .attr('fill', 'none')
+
+                    that.drawUsers(svg, selected_persons)
+
+                    selected_persons = []
+                }
+
                 svg.select('#pointer')
                     .remove()
 
                 selecting = false;
-
-                console.log(selected_persons)
-
-                selected_persons = []
 
                 d3.selectAll('.point').attr('selected', 0 )
 
