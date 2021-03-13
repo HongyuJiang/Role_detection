@@ -206,6 +206,8 @@ class MapBase extends React.Component {
 
         });
 
+        DataProvider.getUserSeqs()
+
         let that = this
             
         this.token = PubSub.subscribe('send-data', (eventName, data)=>{

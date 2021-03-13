@@ -19,17 +19,15 @@ app.post('/getRecordsByUser', (req, res) => {
   const MongoClient = require('mongodb').MongoClient;//创建服务器实例
   const uri = "mongodb+srv://lanmiemie:zly3885251@mobiledata.ez0ez.mongodb.net/MobileData?retryWrites=true&w=majority";
   
-  let data = Object.keys(req.body)[0];
+  let data = req.body;
 
-  let persons = JSON.parse(data)['persons']//和userembvis中的selected_persons_dict是一样的
+  let person = Object.keys(data)//和userembvis中的selected_persons_dict是一样的
 
   MongoClient.connect(uri, { useNewUrlParser: true }).then((conn) => {    //与网上的mongdb服务器连接
 
-      let fake_persons = {"13035631411": 1}
-
       const db = conn.db("cotton");//创建数据库的实例
       // 增加
-      db.collection("miao").find({}, {fields: persons}).toArray().then((arr) => {
+      db.collection("miao").find({}, {fields: person}).toArray().then((arr) => {
 
           ret_data = arr[0]
           //console.log("ret_data",ret_data)
@@ -52,17 +50,17 @@ app.post('/getDetailsByUser', (req, res) => {
   const MongoClient = require('mongodb').MongoClient;//创建服务器实例
   const uri = "mongodb+srv://lanmiemie:zly3885251@mobiledata.ez0ez.mongodb.net/MobileData?retryWrites=true&w=majority";
   
-  let data = Object.keys(req.body)[0];
+  let data = req.body;
 
-  let persons = JSON.parse(data)['persons']//和userembvis中的selected_persons_dict是一样的
+  let person = Object.keys(data)[0]
 
   MongoClient.connect(uri, { useNewUrlParser: true }).then((conn) => {    //与网上的mongdb服务器连接
 
-      let fake_person = '18608080118'
+      console.log(person)
 
       const db = conn.db("cotton");//创建数据库的实例
       // 增加
-      db.collection("person_seq").find({'person': fake_person}).toArray().then((arr) => {
+      db.collection("person_seq").find({'person': person}).toArray().then((arr) => {
     
           res.status(200).send(JSON.stringify(arr))
 

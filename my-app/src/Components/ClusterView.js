@@ -22,9 +22,36 @@ class ClusterView extends React.Component {
 
     }
 
+    queryPersonalData(user){
+
+        $.post('http://localhost:4001/getRecordsByUser/', user)
+               .done(function( data ) {
+                
+                PubSub.publish('send-data', JSON.parse(data));
+
+                if(this.detailData == undefined){
+
+                    console.log(DataProvider.person_seqs_dict[user])
+                   
+                    if(DataProvider.person_seqs_dict[user] != undefined){
+
+                        let seq = DataProvider.person_seqs_dict[user]
+                        PubSub.publish('details-data', seq);
+                    }
+                     
+                }
+                else{
+
+                    PubSub.publish('details-data', this.detailData);
+                }
+                
+        });
+    }
+
     drawUsers(svg, persons){
 
         persons = persons.splice(0,20)
+        let that = this
 
         let userContainer = svg.append('g').attr('id', 'userContainer')
         let person_num = persons.length
@@ -45,6 +72,12 @@ class ClusterView extends React.Component {
         .attr('cx', (d,i) => R * Math.sin(angleScale(i)))
         .attr('cy', (d,i) => R * Math.cos(angleScale(i)))
         .attr('fill', 'steelblue')
+        .on('click', (d,i) => {
+
+            console.log(i)
+
+            //that.queryPersonalData(d)
+        })
 
         userContainer.selectAll('.userName')
         .data(persons)
@@ -54,6 +87,16 @@ class ClusterView extends React.Component {
         .attr('y', (d,i) => R * Math.cos(angleScale(i)) + 5)
         .text( d => '#' + d.slice(7, 11) )
         .attr('font-size', 11)
+        .on('click', (event, d) => {
+
+            console.log(d)
+
+            that.queryPersonalData(d)
+        })
+        .on("mouseover", function (d) {
+
+            d3.select(this).style("cursor", "grab");
+        })
     }
 
     drawBackGround(svg, width, height) {
@@ -64,11 +107,7 @@ class ClusterView extends React.Component {
             .attr('opacity', 0.1)
             .attr('cx', width / 2)
             .attr('cy', height / 2)
-            .on('click', d => {
-
-                
-            })
-
+           
         svg.append('g')
             .attr('transform', 'translate(' + width / 2 + ',' + (height / 2) + ')')
             .selectAll('axisLine')
@@ -124,7 +163,9 @@ class ClusterView extends React.Component {
         let selecting = false
         let selected_persons = []
 
-        svg.append('g').selectAll('points')
+        let dotContainer =  svg.append('g')
+        
+        dotContainer.selectAll('points')
             .data(data)
             .enter()
             .append('circle')
@@ -136,13 +177,13 @@ class ClusterView extends React.Component {
             .attr('cx', d => d.x * zoom_lambda + width / 2)
             .attr('cy', d => d.y * zoom_lambda + height / 2)
 
-        svg.on("mouseover", function (d) {
-            d3.select(this).style("cursor", "crosshair");
-        })
+        dotContainer.on("mouseover", function (d) {
+                d3.select(this).style("cursor", "crosshair");
+            })
             .on('mousedown', function (d) {
 
                 var coords = d3.pointer(d, this);
-                svg.append('circle')
+                dotContainer.append('circle')
                     .attr('id', 'pointer')
                     .attr('r', 5)
                     .attr('fill', 'red')
@@ -158,14 +199,14 @@ class ClusterView extends React.Component {
 
                     var coords = d3.pointer(d, this);
 
-                    svg.select('#pointer')
+                    dotContainer.select('#pointer')
                         .attr('cx', coords[0])
                         .attr('cy', coords[1])
 
                     let x = coords[0]
                     let y = coords[1]
 
-                    svg.selectAll('.point')
+                    dotContainer.selectAll('.point')
                         .attr('fill', function (d) {
 
                             let cx = d.x * zoom_lambda + width / 2
@@ -206,7 +247,7 @@ class ClusterView extends React.Component {
                     selected_persons = []
                 }
 
-                svg.select('#pointer')
+                dotContainer.select('#pointer')
                     .remove()
 
                 selecting = false;
