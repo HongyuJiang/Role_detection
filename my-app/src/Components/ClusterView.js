@@ -30,12 +30,11 @@ class ClusterView extends React.Component {
                 PubSub.publish('send-data', JSON.parse(data));
 
                 if(this.detailData == undefined){
-
-                    console.log(DataProvider.person_seqs_dict[user])
                    
                     if(DataProvider.person_seqs_dict[user] != undefined){
 
                         let seq = DataProvider.person_seqs_dict[user]
+                        DataProvider.detailData = seq
                         PubSub.publish('details-data', seq);
                     }
                      
@@ -53,43 +52,30 @@ class ClusterView extends React.Component {
         persons = persons.splice(0,20)
         let that = this
 
+        d3.select('#userContainer').remove()
         let userContainer = svg.append('g').attr('id', 'userContainer')
         let person_num = persons.length
         let R = window.innerHeight / 4
+        let arcR = R * 0.9
         var pi = Math.PI;
-        let startAngle = 30 * (pi/180);
-        let endAngle = 150 * (pi/180);
+        let startAngle = 10 * (pi/180);
+        let endAngle = 170 * (pi/180);
         
         userContainer.attr('transform', d => 'translate(' + (R * 0.7) + ',' + R + ')')
 
         let angleScale = d3.scaleLinear().domain([0, person_num]).range([startAngle, endAngle])
 
-        userContainer.selectAll('.userDot')
-        .data(persons)
-        .enter()
-        .append('circle')
-        .attr('r', 3)
-        .attr('cx', (d,i) => R * Math.sin(angleScale(i)))
-        .attr('cy', (d,i) => R * Math.cos(angleScale(i)))
-        .attr('fill', 'steelblue')
-        .on('click', (d,i) => {
-
-            console.log(i)
-
-            //that.queryPersonalData(d)
-        })
 
         userContainer.selectAll('.userName')
         .data(persons)
         .enter()
         .append('text')
-        .attr('x', (d,i) => R * Math.sin(angleScale(i)) + 5)
-        .attr('y', (d,i) => R * Math.cos(angleScale(i)) + 5)
+        .attr('x', (d,i) => arcR * Math.sin(angleScale(i)) + 10)
+        .attr('y', (d,i) => arcR * Math.cos(angleScale(i)) + 5)
         .text( d => '#' + d.slice(7, 11) )
-        .attr('font-size', 11)
+        .attr('font-size', 12)
+        .attr('class', 'userName')
         .on('click', (event, d) => {
-
-            console.log(d)
 
             that.queryPersonalData(d)
         })
@@ -97,6 +83,50 @@ class ClusterView extends React.Component {
 
             d3.select(this).style("cursor", "grab");
         })
+
+        userContainer.selectAll('.userDot')
+        .data(persons)
+        .enter()
+        .append('circle')
+        .attr('class', 'userDot')
+        .attr('r', 3)
+        .attr('cx', (d,i) => arcR * Math.sin(angleScale(i)))
+        .attr('cy', (d,i) => arcR * Math.cos(angleScale(i)))
+        .attr('fill', 'steelblue')
+        
+        userContainer.append('circle')
+        .attr('r', 30)
+        .attr('id', 'center')
+        .attr('cx', R * 0.3)
+        .attr('cy', 0)
+        .attr('fill', 'black')
+        .attr('opacity', 0.5)
+        .on('click', d => {
+
+            d3.selectAll('.userDot')
+            .transition()
+            .attr('cx', 0).attr('cy', 0).attr('opacity', 0)
+
+            d3.selectAll('.userName')
+            .transition()
+            .attr('x', 0).attr('y', 0).attr('opacity', 0)
+
+            d3.select('#center')
+            .transition()
+            .attr('r', R)
+            .attr('opacity', 0)
+            .on("end", q => {
+
+                d3.select('#userContainer').remove()
+
+                d3.selectAll('.point')
+                .transition()
+                .attr('opacity', 1)
+                .attr('fill', 'black')
+            });
+            
+        })
+
     }
 
     drawBackGround(svg, width, height) {
@@ -158,12 +188,12 @@ class ClusterView extends React.Component {
         const svg = canvas.append('g')
             .attr('transform', 'translate(0,50)')
 
-        this.drawBackGround(svg, width, height)
-
         let selecting = false
         let selected_persons = []
 
         let dotContainer =  svg.append('g')
+
+        this.drawBackGround(dotContainer, width, height)
         
         dotContainer.selectAll('points')
             .data(data)
@@ -229,23 +259,13 @@ class ClusterView extends React.Component {
 
             .on('mouseup', function (d) {
 
-                if (selected_persons.length == 0){
+                d3.selectAll('.point')
+                .attr('fill', 'none')
+                .attr('opacity', '0')
 
-                    d3.select('#userContainer').remove()
+                that.drawUsers(svg, selected_persons)
 
-                    d3.selectAll('.point')
-                    .attr('fill', 'black')
-
-                }
-                else{
-
-                    d3.selectAll('.point')
-                    .attr('fill', 'none')
-
-                    that.drawUsers(svg, selected_persons)
-
-                    selected_persons = []
-                }
+                selected_persons = []
 
                 dotContainer.select('#pointer')
                     .remove()

@@ -38,10 +38,10 @@ class GanttBot extends React.Component {
         let begin_date = tParser('1/3/2015 00:00:00')
         let end_date = tParser('14/3/2015 00:00:00')
 
-        records = records.filter(d => {
-            if(d.date > begin_date && d.date < end_date)
-            return 1
-        })
+        //records = records.filter(d => {
+            //if(d.date > begin_date && d.date < end_date)
+            //return 1
+       // })
 
         records.forEach(d => {
 
@@ -49,7 +49,7 @@ class GanttBot extends React.Component {
             if(d.date < time_min) time_min = d.date
         })
 
-        for(let i=1;i<records.length;i+=1){
+        for(let i = 1; i < records.length; i += 1){
 
             let event = {}
             event['start'] = records[i-1].date
@@ -89,13 +89,17 @@ class GanttBot extends React.Component {
 
             if(clusterAssigner[d.cell] != undefined)
                 existedCluster[clusterAssigner[d.cell]] = 1
+            else {
+                clusterAssigner[d.cell] = Object.keys(clusterAssigner).length
+                existedCluster[clusterAssigner[d.cell]] = 1
+            }
         })
 
         let clusterNum = Object.keys(existedCluster).length
 
         let xScale = d3.scaleTime().domain([time_min, time_max]).range([50, width - 50])
 
-        let yScale = d3.scaleLinear().domain([0, clusterNum]).range([20, height - 20])
+        let yScale = d3.scaleLinear().domain([0, clusterNum]).range([10, height - 30])
 
         var clusterColors = d3.scaleOrdinal().domain(cluster_IDs)
         .range(d3.schemeSet2);
@@ -121,7 +125,7 @@ class GanttBot extends React.Component {
         .attr('width', d => xScale(d.et) - xScale(d.bt))
         .attr('stroke', 'white')
         .attr('stroke-width', 2)
-        .attr('height', 200)
+        .attr('height', height - 20)
         .attr('fill', 'black')
         .attr('x', d => xScale(d.bt))
         .attr('y', 0)
@@ -134,10 +138,11 @@ class GanttBot extends React.Component {
         .enter()
         .append('text')
         .attr('fill', 'black')
-        .attr('x', d => xScale(d.bt) + 35)
-        .attr('y', 180)
+        .attr('x', d => xScale(d.bt) + 10)
+        .attr('y', 190)
         .attr('opacity', 1)
-        .attr('font-size', 16)
+        .attr('font-size', 12)
+        .attr('opacity', '0.7')
         .text(d => weekdays[d.bt.getDay()])
 
         canvas.append('g').selectAll('.event_line')
@@ -152,6 +157,8 @@ class GanttBot extends React.Component {
         .attr('stroke-opacity', '0.3')
         .attr('stroke-width', '1')
 
+        let color_assigner = DataProvider.color_assigner
+
         canvas.append('g').selectAll('.cell_node')
         .data(records.filter(d => clusterAssigner[d.cell] != undefined))
         .enter()
@@ -164,8 +171,9 @@ class GanttBot extends React.Component {
     
         })
         .attr('r', 3)
-        .attr('stroke', d => clusterColors(clusterAssigner[d.cell]))
+        .attr('stroke', d => color_assigner(clusterAssigner[d.cell]))
         .attr('fill', 'none')
+        .attr('stroke-width', 1.5)
   
     }
 

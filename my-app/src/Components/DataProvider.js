@@ -17,11 +17,11 @@ export default class DataProvider {
 
     static person_seqs_dict = {}
 
+    static color_assigner = {}
+
     static getUserSeqs(){
 
        let that = this
-
-       console.log(that)
 
        d3.csv('/person_seqs.csv').then(data => {
 
@@ -38,6 +38,8 @@ export default class DataProvider {
                     that.person_seqs_dict[d.person].push({'time': d.time, 'cell': d.cell})
                 }
             })
+
+            
        })
     }
 

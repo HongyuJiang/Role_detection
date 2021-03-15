@@ -122,6 +122,9 @@ class MapBase extends React.Component {
 
         let ccList = []
 
+        var myColor = d3.scaleOrdinal().domain(cluster_with_id)
+        .range(d3.schemeSet2);
+
         clusters.forEach(cluster => {
 
             let pp = []
@@ -143,21 +146,20 @@ class MapBase extends React.Component {
 
             var p = this.map.unproject(ccData)
 
-            //if(ccData.r >= 0){
             let meta = {};
             meta["properties"] = {};
             meta["properties"]['radius'] = ccData.r + 3;
-            meta["properties"]['color'] = d3.schemeSet2[cluster_with_id.length - 1]
+            meta["properties"]['color'] = myColor(cluster_with_id.length - 1)
             meta["type"] = "Feature";
             meta["geometry"] = {};
             meta["geometry"]["type"] = "Point";
             meta["geometry"]["coordinates"] = [p.lng, p.lat];
 
             ccList.push(meta)
-            //}
 
         })
 
+        DataProvider.color_assigner = myColor
         DataProvider.clusters = cluster_with_id
 
      //let cluster_IDs = Array.from(new Array(cluster_with_id.length + 1).keys()).slice(1)
@@ -193,12 +195,15 @@ class MapBase extends React.Component {
     }
 
     componentDidMount() {
+        
         this.map = new mapboxgl.Map({
             container: this.mapContainer,
             style: 'mapbox://styles/hongyujiang/cja85j9mi0a752rsu2qjp5cev',
             center: [this.state.lng, this.state.lat],
             zoom: this.state.zoom
         });
+
+        d3.selectAll('.mapboxgl-ctrl').remove()
 
         DataProvider.getCellInfo().then((response) => {
             let data = response.data;
@@ -227,8 +232,10 @@ class MapBase extends React.Component {
             if(this.cells != undefined)
                 that.CalculateCluster(this.cells)
 
-            if(DataProvider.detailData != undefined)
+            if(DataProvider.detailData != undefined){
+
                 PubSub.publish('details-data', DataProvider.detailData);
+            }
                 
         })
     }
