@@ -13,6 +13,11 @@ export default class DataProvider {
         return axios.get('/user_emb.json');
     }
 
+    static getUserRelationData() {
+
+        return axios.get('/person_relations.json');
+    }
+
     static cell_info = {}
 
     static person_seqs_dict = {}
