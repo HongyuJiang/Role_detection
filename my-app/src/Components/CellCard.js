@@ -1,6 +1,5 @@
 import React from 'react';
 import * as d3 from 'd3';
-import $ from "jquery";
 import PubSub from 'pubsub-js'
 import DataProvider from "./DataProvider";
 
@@ -84,6 +83,18 @@ class CellCard extends React.Component {
         .attr('height', 75)
         .attr('fill', 'grey')
         .attr('opacity', 0.2)
+
+        cards.append('text')
+        .attr('x', width - 15)
+        .attr('y', 10)
+        .attr('font-size', 11)
+        .text(sum_max)
+
+        cards.append('text')
+        .attr('x', 15)
+        .attr('y', 75 - 5)
+        .attr('font-size', 11)
+        .text('0 - 24')
 
         cards.append('text')
         .attr('x', 10)

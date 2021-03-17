@@ -3,6 +3,7 @@ import * as d3 from 'd3';
 import $ from "jquery";
 import PubSub from 'pubsub-js'
 import DataProvider from "./DataProvider";
+import { reduce } from 'd3';
 
 class ClusterView extends React.Component {
     constructor(props) {
@@ -70,12 +71,19 @@ class ClusterView extends React.Component {
         .data(persons)
         .enter()
         .append('text')
+        .attr('class', 'userName')
         .attr('x', (d,i) => arcR * Math.sin(angleScale(i)) + 10)
         .attr('y', (d,i) => arcR * Math.cos(angleScale(i)) + 5)
         .text( d => '#' + d.slice(7, 11) )
         .attr('font-size', 12)
         .attr('class', 'userName')
         .on('click', (event, d) => {
+
+            d3.selectAll('.userName').attr('fill', q => {
+
+                if (q == d) return 'red'
+                else return 'grey'
+            })
 
             that.queryPersonalData(d)
         })
@@ -189,7 +197,7 @@ class ClusterView extends React.Component {
             .attr('transform', 'translate(0,50)')
 
         let selecting = false
-        let selected_persons = []
+        let selected_persons = {}
 
         let dotContainer =  svg.append('g')
 
@@ -203,6 +211,7 @@ class ClusterView extends React.Component {
             .attr('person', d => d.person)
             .attr('r', 1)
             .attr('fill', 'black')
+            .attr('selected', '0')
             .attr('opacity', '0.5')
             .attr('cx', d => d.x * zoom_lambda + width / 2)
             .attr('cy', d => d.y * zoom_lambda + height / 2)
@@ -226,9 +235,7 @@ class ClusterView extends React.Component {
             .on('mousemove', function (d) {
 
                 if (selecting) {
-
                     var coords = d3.pointer(d, this);
-
                     dotContainer.select('#pointer')
                         .attr('cx', coords[0])
                         .attr('cy', coords[1])
@@ -236,45 +243,52 @@ class ClusterView extends React.Component {
                     let x = coords[0]
                     let y = coords[1]
 
-                    dotContainer.selectAll('.point')
-                        .attr('fill', function (d) {
+                    d3.selectAll('.point')
+                        .style('fill', d => {
 
                             let cx = d.x * zoom_lambda + width / 2
                             let cy = d.y * zoom_lambda + height / 2
                             let dis = (x - cx) * (x - cx) + (y - cy) * (y - cy)
 
-                            if (dis <= 25) {
-
-                                d3.select(this).attr('selected', 1)
-                                let person = d3.select(this).attr('person')
-                                selected_persons.push(person)//selected_persons中为选中的person
+                            if (d.selected == '2'){
                                 return 'red'
-                               
+                            }
+                                
+                            if (dis <= 25) {
+                                selected_persons[d.person] = 1
+                                d.selected = 2
+                                return 'red'
                             }
 
+                            return 'black'
                         })
                 }
 
             })
-
+            
             .on('mouseup', function (d) {
 
                 d3.selectAll('.point')
                 .attr('fill', 'none')
                 .attr('opacity', '0')
 
-                that.drawUsers(svg, selected_persons)
+                let persons = []
+                for (let user in selected_persons)
+                    persons.push(user)
 
-                selected_persons = []
-
-                dotContainer.select('#pointer')
-                    .remove()
+                that.drawUsers(svg, persons)
+                selected_persons = {}
+            
+                dotContainer.select('#pointer').remove()
 
                 selecting = false;
 
-                d3.selectAll('.point').attr('selected', 0 )
+                d3.selectAll('.point').attr('selected', d =>{
+                    d.selected = 0
+                } )
 
             })
+            
 
     }
 
