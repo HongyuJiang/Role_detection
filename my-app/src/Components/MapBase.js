@@ -118,7 +118,7 @@ class MapBase extends React.Component {
 
         let cluster_with_id = []
 
-        var clusters = dbscan.run(points, 15, 2);
+        var clusters = dbscan.run(points, 15, 1);
 
         let ccList = []
 

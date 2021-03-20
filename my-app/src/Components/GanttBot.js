@@ -71,7 +71,7 @@ class GanttBot extends React.Component {
 
         let clusters = DataProvider.clusters;
 
-        let cluster_IDs = Array.from(new Array(clusters.length + 1).keys()).slice(1)
+        console.log(clusters)
 
         let clusterAssigner = {}
 
@@ -95,14 +95,14 @@ class GanttBot extends React.Component {
             }
         })
 
+
+        console.log(clusterAssigner)
+
         let clusterNum = Object.keys(existedCluster).length
 
         let xScale = d3.scaleTime().domain([time_min, time_max]).range([50, width - 50])
 
         let yScale = d3.scaleLinear().domain([0, clusterNum]).range([10, height - 30])
-
-        var clusterColors = d3.scaleOrdinal().domain(cluster_IDs)
-        .range(d3.schemeSet2);
 
         let timeList = []
 

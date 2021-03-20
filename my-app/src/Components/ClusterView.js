@@ -18,7 +18,13 @@ class ClusterView extends React.Component {
 
             let data = response.data;
 
-            that.drawGraphs(data)
+            that.drawEmbGraphs(data)
+
+            DataProvider.getUserRelationData().then(response => {
+
+                let data = response.data
+                that.relationsData = data
+            })
         })
 
     }
@@ -50,8 +56,32 @@ class ClusterView extends React.Component {
 
     drawUsers(svg, persons){
 
-        persons = persons.splice(0,20)
+        //persons = persons.splice(0,20)
         let that = this
+        let personDict = {}
+        let connections = []
+
+        persons.forEach(person => {
+
+            personDict[person] = 1
+        })
+
+        persons.forEach(person => {
+
+            if(this.relationsData[person] != undefined){
+
+                let receivers = this.relationsData[person]
+
+                for (let recer in receivers){
+                    if (personDict[recer] != undefined)
+                        connections.push({
+                            'source': person, 
+                            'target': recer, 
+                            'weight':receivers[recer]})
+                }
+            }
+
+        })
 
         d3.select('#userContainer').remove()
         let userContainer = svg.append('g').attr('id', 'userContainer')
@@ -66,7 +96,6 @@ class ClusterView extends React.Component {
 
         let angleScale = d3.scaleLinear().domain([0, person_num]).range([startAngle, endAngle])
 
-
         userContainer.selectAll('.userName')
         .data(persons)
         .enter()
@@ -80,7 +109,6 @@ class ClusterView extends React.Component {
         .on('click', (event, d) => {
 
             d3.selectAll('.userName').attr('fill', q => {
-
                 if (q == d) return 'red'
                 else return 'grey'
             })
@@ -88,7 +116,6 @@ class ClusterView extends React.Component {
             that.queryPersonalData(d)
         })
         .on("mouseover", function (d) {
-
             d3.select(this).style("cursor", "grab");
         })
 
@@ -97,10 +124,38 @@ class ClusterView extends React.Component {
         .enter()
         .append('circle')
         .attr('class', 'userDot')
+        .attr('id', d => {
+            return 'dot' + d
+        })
         .attr('r', 3)
         .attr('cx', (d,i) => arcR * Math.sin(angleScale(i)))
         .attr('cy', (d,i) => arcR * Math.cos(angleScale(i)))
         .attr('fill', 'steelblue')
+
+        connections.forEach(link => {
+
+            let sourceNode = userContainer.select('#dot' + link.source)
+            let targetNode = userContainer.select('#dot' + link.target)
+
+            let sourceLoc = {'x': sourceNode.attr('cx'), 'y': sourceNode.attr('cy')}
+            let targetLoc = {'x': targetNode.attr('cx'), 'y': targetNode.attr('cy')}
+
+            let line = userContainer.append('path')
+            .attr('d', d => {
+
+                var dx = (targetLoc.x - sourceLoc.x),
+                dy = (targetLoc.y - sourceLoc.y),
+                dr = Math.sqrt(dx * dx + dy * dy);
+                return "M" + sourceLoc.x + "," + sourceLoc.y + "A" 
+                + dr + "," + dr + " 0 0,1 " + targetLoc.x + "," + targetLoc.y;
+        
+            })
+            .attr('stroke', 'black')
+            .attr('fill', 'none')
+
+            console.log(line)
+            
+        })
         
         userContainer.append('circle')
         .attr('r', 30)
@@ -111,26 +166,20 @@ class ClusterView extends React.Component {
         .attr('opacity', 0.5)
         .on('click', d => {
 
-            d3.selectAll('.userDot')
-            .transition()
+            d3.selectAll('.userDot').transition()
             .attr('cx', 0).attr('cy', 0).attr('opacity', 0)
 
-            d3.selectAll('.userName')
-            .transition()
+            d3.selectAll('.userName').transition()
             .attr('x', 0).attr('y', 0).attr('opacity', 0)
 
-            d3.select('#center')
-            .transition()
-            .attr('r', R)
-            .attr('opacity', 0)
+            d3.select('#center').transition()
+            .attr('r', R).attr('opacity', 0)
             .on("end", q => {
 
                 d3.select('#userContainer').remove()
 
-                d3.selectAll('.point')
-                .transition()
-                .attr('opacity', 1)
-                .attr('fill', 'black')
+                d3.selectAll('.point').transition()
+                .attr('opacity', 1).attr('fill', 'black')
             });
             
         })
@@ -178,7 +227,7 @@ class ClusterView extends React.Component {
 
     }
 
-    drawGraphs(data) {
+    drawEmbGraphs(data) {
 
         let height = window.innerHeight / 2
 
@@ -250,10 +299,8 @@ class ClusterView extends React.Component {
                             let cy = d.y * zoom_lambda + height / 2
                             let dis = (x - cx) * (x - cx) + (y - cy) * (y - cy)
 
-                            if (d.selected == '2'){
-                                return 'red'
-                            }
-                                
+                            if (d.selected == '2') return 'red'
+                        
                             if (dis <= 25) {
                                 selected_persons[d.person] = 1
                                 d.selected = 2
@@ -285,10 +332,9 @@ class ClusterView extends React.Component {
 
                 d3.selectAll('.point').attr('selected', d =>{
                     d.selected = 0
-                } )
+                })
 
             })
-            
 
     }
 
