@@ -14,9 +14,7 @@ class GanttBot extends React.Component {
         let that = this
 
         this.token = PubSub.subscribe('details-data', (eventName, data)=>{
-
             that.drawGantt(data)
-
         })
         
     }
@@ -35,8 +33,8 @@ class GanttBot extends React.Component {
             d.date = tParser(d.time)
         })
 
-        let begin_date = tParser('1/3/2015 00:00:00')
-        let end_date = tParser('14/3/2015 00:00:00')
+        //let begin_date = tParser('1/3/2015 00:00:00')
+        //let end_date = tParser('14/3/2015 00:00:00')
 
         //records = records.filter(d => {
             //if(d.date > begin_date && d.date < end_date)
@@ -49,12 +47,18 @@ class GanttBot extends React.Component {
             if(d.date < time_min) time_min = d.date
         })
 
+        records = records.sort((a,b) => {
+
+            return a.date - b.date
+        })
+
         for(let i = 1; i < records.length; i += 1){
 
             let event = {}
             event['start'] = records[i-1].date
             event['end'] = records[i].date
-            event['cell'] = records[i-1].cell
+            event['scell'] = records[i-1].cell
+            event['ecell'] = records[i].cell
 
             eventList.push(event)
         }
@@ -71,8 +75,6 @@ class GanttBot extends React.Component {
 
         let clusters = DataProvider.clusters;
 
-        console.log(clusters)
-
         let clusterAssigner = {}
 
         for(let no = 0; no < clusters.length; no++){
@@ -85,24 +87,13 @@ class GanttBot extends React.Component {
 
         let existedCluster = {}
 
-        records.forEach(d => {
-
-            if(clusterAssigner[d.cell] != undefined)
-                existedCluster[clusterAssigner[d.cell]] = 1
-            else {
-                clusterAssigner[d.cell] = Object.keys(clusterAssigner).length
-                existedCluster[clusterAssigner[d.cell]] = 1
-            }
-        })
-
-
-        console.log(clusterAssigner)
-
-        let clusterNum = Object.keys(existedCluster).length
+        for (let cluster in clusterAssigner){
+            existedCluster[clusterAssigner[cluster]] = 1
+        }
 
         let xScale = d3.scaleTime().domain([time_min, time_max]).range([50, width - 50])
 
-        let yScale = d3.scaleLinear().domain([0, clusterNum]).range([10, height - 30])
+        let yScale = d3.scaleLinear().domain([0, Object.keys(existedCluster).length]).range([10, height - 10])
 
         let timeList = []
 
@@ -146,16 +137,23 @@ class GanttBot extends React.Component {
         .text(d => weekdays[d.bt.getDay()])
 
         canvas.append('g').selectAll('.event_line')
-        .data(eventList)
+        .data(eventList.filter(d => clusterAssigner[d.scell] != undefined 
+            && clusterAssigner[d.ecell] != undefined))
         .enter()
         .append('line')
         .attr('x1', d => xScale(d.start))
         .attr('x2', d => xScale(d.end))
-        .attr('y1', d => yScale(clusterAssigner[d.cell]))
-        .attr('y2', d => yScale(clusterAssigner[d.cell]))
-        .attr('stroke', 'black')
-        .attr('stroke-opacity', '0.3')
-        .attr('stroke-width', '1')
+        .attr('y1', d => {
+            return yScale(clusterAssigner[d.scell])
+        })
+        .attr('y2', d => yScale(clusterAssigner[d.ecell]))
+        .attr('stroke', 'grey')
+        .attr('stroke-dasharray', d => {
+            if (d.scell != d.ecell) return '2 2 2 2'
+            else return 'none'
+        })
+        .attr('stroke-opacity', '0.5')
+        .attr('stroke-width', '2')
 
         let color_assigner = DataProvider.color_assigner
 

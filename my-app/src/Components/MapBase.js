@@ -122,13 +122,12 @@ class MapBase extends React.Component {
 
         let ccList = []
 
-        var myColor = d3.scaleOrdinal().domain(cluster_with_id)
+        var myColor = d3.scaleOrdinal().domain([0, clusters.length])
         .range(d3.schemeSet2);
 
         clusters.forEach(cluster => {
 
             let pp = []
-
             let nodes = []
 
             cluster.forEach(c => {
@@ -140,11 +139,9 @@ class MapBase extends React.Component {
 
             cluster_with_id.push(nodes)
 
-            var cc = minimumCircle().data(pp)
-
-            var ccData = cc()
-
-            var p = this.map.unproject(ccData)
+            let cc = minimumCircle().data(pp)
+            let ccData = cc()
+            let p = this.map.unproject(ccData)
 
             let meta = {};
             meta["properties"] = {};
@@ -158,6 +155,8 @@ class MapBase extends React.Component {
             ccList.push(meta)
 
         })
+
+        console.log(cluster_with_id)
 
         DataProvider.color_assigner = myColor
         DataProvider.clusters = cluster_with_id

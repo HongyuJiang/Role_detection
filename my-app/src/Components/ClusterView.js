@@ -140,20 +140,23 @@ class ClusterView extends React.Component {
             let sourceLoc = {'x': sourceNode.attr('cx'), 'y': sourceNode.attr('cy')}
             let targetLoc = {'x': targetNode.attr('cx'), 'y': targetNode.attr('cy')}
 
-            let line = userContainer.append('path')
-            .attr('d', d => {
+            if(targetLoc.y - sourceLoc.y < 0){
 
-                var dx = (targetLoc.x - sourceLoc.x),
-                dy = (targetLoc.y - sourceLoc.y),
-                dr = Math.sqrt(dx * dx + dy * dy);
-                return "M" + sourceLoc.x + "," + sourceLoc.y + "A" 
-                + dr + "," + dr + " 0 0,1 " + targetLoc.x + "," + targetLoc.y;
-        
-            })
-            .attr('stroke', 'black')
-            .attr('fill', 'none')
+                let line = userContainer.append('path')
+                .attr('d', d => {
 
-            console.log(line)
+                    var dx = (targetLoc.x - sourceLoc.x),
+                    dy = (targetLoc.y - sourceLoc.y),
+                    dr = Math.sqrt(dx * dx + dy * dy) * 0.8;
+                    return "M" + sourceLoc.x + "," + sourceLoc.y + "A" 
+                    + dr + "," + dr + " 0 0,1 " + targetLoc.x + "," + targetLoc.y;
+            
+                })
+                .attr('stroke', 'red')
+                .attr('stroke-opacity', '0.7')
+                .attr('stroke-width', '2')
+                .attr('fill', 'none')
+            }
             
         })
         
@@ -179,7 +182,7 @@ class ClusterView extends React.Component {
                 d3.select('#userContainer').remove()
 
                 d3.selectAll('.point').transition()
-                .attr('opacity', 1).attr('fill', 'black')
+                .attr('opacity', 0.5).attr('fill', 'black')
             });
             
         })
