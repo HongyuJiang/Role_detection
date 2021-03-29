@@ -1,8 +1,9 @@
 import React from 'react';
 import * as d3 from 'd3';
-import $ from "jquery";
+import { tip as d3tip } from "d3-v6-tip";
 import PubSub from 'pubsub-js'
 import DataProvider from "./DataProvider";
+import "../d3-tip.min.css"
 
 class GanttBot extends React.Component {
     constructor(props) {
@@ -29,17 +30,13 @@ class GanttBot extends React.Component {
 
         const tParser = d3.timeParse("%d/%m/%Y %H:%M:%S")
 
+        const MyTip = d3tip().attr('class', 'd3-tip').html((EVENT,d) => {
+            return '基站:' + DataProvider.cell_info[d.cell].name + '<br>' + '时间: ' + d.time
+        });
+
         records.forEach(d => {
             d.date = tParser(d.time)
         })
-
-        //let begin_date = tParser('1/3/2015 00:00:00')
-        //let end_date = tParser('14/3/2015 00:00:00')
-
-        //records = records.filter(d => {
-            //if(d.date > begin_date && d.date < end_date)
-            //return 1
-       // })
 
         records.forEach(d => {
 
@@ -48,7 +45,6 @@ class GanttBot extends React.Component {
         })
 
         records = records.sort((a,b) => {
-
             return a.date - b.date
         })
 
@@ -73,6 +69,8 @@ class GanttBot extends React.Component {
         .attr('width', width)
         .attr('height', height)
 
+        canvas.call(MyTip)
+
         let clusters = DataProvider.clusters;
 
         let clusterAssigner = {}
@@ -80,7 +78,6 @@ class GanttBot extends React.Component {
         for(let no = 0; no < clusters.length; no++){
 
             clusters[no].forEach(node => {
-
                 clusterAssigner[node] = no
             })
         }
@@ -108,6 +105,27 @@ class GanttBot extends React.Component {
 
             timeList.push({'bt': bt, 'et': et})
         }
+
+        let histData = d3.bin()
+            .value(d => d.date)
+            .thresholds(20)
+        (records)
+
+        let lscale = d3.scaleLinear().domain([0, d3.max(histData, d => d.length)]).range([0, height / 2])
+
+        //console.log(histData)
+
+        let area = d3.area()
+            .curve(d3.curveBasis)
+            .x(d => xScale((d.x1 + d.x0) / 2))
+            .y0(height - 20)
+            .y1(d => height - 20 - lscale(d.length))
+
+        canvas.append('g').append("path")
+            .datum(histData)
+            .attr("d", area)
+            .attr('fill', 'black')
+            .attr('opacity', 0.1)
 
         canvas.append('g').selectAll('.day_rect')
         .data(timeList)
@@ -163,7 +181,6 @@ class GanttBot extends React.Component {
         .append('circle')
         .attr('cx', d => (xScale(d.date)))
         .attr('cy', d => {
-
             if(clusterAssigner[d.cell] != undefined)
                 return yScale(clusterAssigner[d.cell])
     
@@ -172,6 +189,13 @@ class GanttBot extends React.Component {
         .attr('stroke', d => color_assigner(clusterAssigner[d.cell]))
         .attr('fill', 'none')
         .attr('stroke-width', 1.5)
+        .on('mouseover', (e, d) => {
+
+            const element = d3.select(this)
+
+            MyTip.show(e, d, element.node())
+        })
+        .on('mouseout', MyTip.hide)
   
     }
 

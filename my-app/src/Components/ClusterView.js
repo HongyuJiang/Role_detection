@@ -130,7 +130,9 @@ class ClusterView extends React.Component {
         .attr('r', 3)
         .attr('cx', (d,i) => arcR * Math.sin(angleScale(i)))
         .attr('cy', (d,i) => arcR * Math.cos(angleScale(i)))
-        .attr('fill', 'steelblue')
+        .attr('stroke', 'steelblue')
+        .attr('stroke-width', '2')
+        .attr('fill', 'white')
 
         connections.forEach(link => {
 
@@ -152,9 +154,9 @@ class ClusterView extends React.Component {
                     + dr + "," + dr + " 0 0,1 " + targetLoc.x + "," + targetLoc.y;
             
                 })
-                .attr('stroke', 'red')
-                .attr('stroke-opacity', '0.7')
-                .attr('stroke-width', '2')
+                .attr('stroke', '#000000f5')
+                .attr('stroke-width', '3')
+                .attr('stroke-dasharray', '2 2 2 2')
                 .attr('fill', 'none')
             }
             

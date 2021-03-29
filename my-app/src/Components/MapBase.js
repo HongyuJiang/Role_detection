@@ -31,8 +31,6 @@ class MapBase extends React.Component {
 
                 let meta = {};
                 meta["properties"] = {};
-                if (cell.name.split("_").length > 1)
-                    cell.name = cell.name.split("_")[1];
                 meta["properties"]["name"] = cell.name.replace("绵阳", "");
                 meta["properties"]["weight"] = 1;
                 meta["type"] = "Feature";
@@ -198,6 +196,7 @@ class MapBase extends React.Component {
         this.map = new mapboxgl.Map({
             container: this.mapContainer,
             style: 'mapbox://styles/hongyujiang/cja85j9mi0a752rsu2qjp5cev',
+            //style: 'mapbox://styles/hongyujiang/cjl1ya0sn4m0m2sqj0pbkuqor',
             center: [this.state.lng, this.state.lat],
             zoom: this.state.zoom
         });
@@ -206,6 +205,21 @@ class MapBase extends React.Component {
 
         DataProvider.getCellInfo().then((response) => {
             let data = response.data;
+            
+            for (let id in data){
+
+                let cell = data[id]
+
+                if (cell.name.split("_").length > 1){
+                    if (cell.name.indexOf('室分') < 0){
+                        cell.name = cell.name.split("_")[1];
+                    }
+                    else{
+                        cell.name = cell.name.split("_")[2];
+                    }
+                }
+            }
+
             DataProvider.cell_info = data
 
         });

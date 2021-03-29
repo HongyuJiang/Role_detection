@@ -118,7 +118,7 @@ class CellCard extends React.Component {
         .attr('width', 8)
         .attr('height', d => sumScale(d.value))
         .attr('fill', '#ff1c2d')
-        .attr('opacity', 0.6)
+        .attr('opacity', 0.3)
 
         cards.transition().duration(1200).attr('transform', (d,i) => {
             return 'translate(0,' + (10 + i * 80) + ')'
