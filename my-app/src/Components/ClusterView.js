@@ -13,20 +13,14 @@ class ClusterView extends React.Component {
     componentDidMount() {
 
         let that = this
-
         DataProvider.getUserEmbData().then(response => {
-
             let data = response.data;
-
             that.drawEmbGraphs(data)
-
             DataProvider.getUserRelationData().then(response => {
-
                 let data = response.data
                 that.relationsData = data
             })
         })
-
     }
 
     queryPersonalData(user){
@@ -86,7 +80,7 @@ class ClusterView extends React.Component {
         d3.select('#userContainer').remove()
         let userContainer = svg.append('g').attr('id', 'userContainer')
         let person_num = persons.length
-        let R = window.innerHeight / 4
+        let R = window.innerHeight / 5
         let arcR = R * 0.9
         var pi = Math.PI;
         let startAngle = 10 * (pi/180);
@@ -234,7 +228,7 @@ class ClusterView extends React.Component {
 
     drawEmbGraphs(data) {
 
-        let height = window.innerHeight / 2
+        let height = window.innerHeight / 2.5
 
         let width = height
         let that = this
@@ -314,6 +308,7 @@ class ClusterView extends React.Component {
 
                             return 'black'
                         })
+
                 }
 
             })
@@ -327,6 +322,8 @@ class ClusterView extends React.Component {
                 let persons = []
                 for (let user in selected_persons)
                     persons.push(user)
+                
+                PubSub.publish('persons-selected', persons);
 
                 that.drawUsers(svg, persons)
                 selected_persons = {}
@@ -346,7 +343,7 @@ class ClusterView extends React.Component {
     render() {
         return (
             <div id='clusterContainer' style={{
-                background: 'none', left: '20px', position: 'absolute', width: '500px', zIndex: '999', height: '500px', top: '20px',
+                background: 'none', left: '20px', position: 'absolute', width: '35%', zIndex: '999', height: '55%', top: '20px',
                 overflowY: 'auto'
             }}>
 

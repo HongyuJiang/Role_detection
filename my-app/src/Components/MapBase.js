@@ -20,16 +20,23 @@ class MapBase extends React.Component {
 
         let cell_dict = DataProvider.cell_info
         let points = [];
+        let sum_max = 0
+
+        for (let cell_id in cells) {
+
+            if(cells[cell_id]['sum'] > sum_max)
+                sum_max = cells[cell_id]['sum']
+        }
 
         for (let cell_id in cells) {
 
             if (cell_dict[cell_id] != undefined) {
                 let cell = cell_dict[cell_id];
                 let meta = {};
-                console.log(cell['name'])
+                //console.log(cell['name'])
                 meta["properties"] = {};
                 meta["properties"]["name"] = cell['name'].replace("绵阳", "");
-                meta["properties"]["weight"] = cells[cell_id]['sum'];
+                meta["properties"]["weight"] = cells[cell_id]['sum'] / sum_max;
                 meta["type"] = "Feature";
                 meta["geometry"] = {};
                 meta["geometry"]["type"] = "Point";
@@ -186,8 +193,8 @@ class MapBase extends React.Component {
             "heatmap-weight": [
               "interpolate",
               ["linear"], ["get", "weight"],
-              8, 0,
-              12, 1,
+              0, 0,
+              1, 1,
             ],
     
             "heatmap-intensity": [
@@ -206,7 +213,7 @@ class MapBase extends React.Component {
               0.4, "rgb(182, 104, 115)",
               0.6, "rgb(242, 183, 5)",
               0.8, "rgb(242, 110, 34)",
-              1.0, "rgb(250, 130, 120)",
+              1.0, "rgb(250, 50, 30)",
             ],
             // Adjust the heatmap radius by zoom level
             "heatmap-radius": [
