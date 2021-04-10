@@ -56,7 +56,7 @@ class ClusterView extends React.Component {
 
     drawUsers(svg, persons){
 
-        //persons = persons.splice(0,20)
+        persons = persons.splice(0,20)
         let that = this
         let personDict = {}
         let connections = []

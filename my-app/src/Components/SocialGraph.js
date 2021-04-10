@@ -14,14 +14,8 @@ class SocialGraph extends React.Component {
         let that = this
 
         this.token = PubSub.subscribe('social-data', (eventName, data)=>{
-
-            //let user = Object.keys(data)[1]
-        
-            //let cell_finger = data[user]
-
             that.drawGraphs(data)
-            
-
+    
         })
         
     }
