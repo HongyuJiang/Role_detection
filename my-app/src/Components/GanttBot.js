@@ -140,7 +140,7 @@ class GanttBot extends React.Component {
         .attr('y', 0)
         .attr('opacity', 0.1)
 
-        let weekdays = ['Mon', 'Tue', 'Web', 'Thu', 'Fri', 'Sat', 'Sun']
+        let weekdays = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
 
         canvas.append('g').selectAll('.day_name')
         .data(timeList)
