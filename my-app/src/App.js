@@ -4,6 +4,7 @@ import CellCard from './Components/CellCard';
 import GanttBot from './Components/GanttBot';
 import ClusterView from './Components/ClusterView';
 import StatMat from './Components/StatMat';
+import UI from './Components/UI';
 
 function App() {
   return (
@@ -14,6 +15,7 @@ function App() {
         <GanttBot />
         <ClusterView />
         <StatMat />
+        <UI />
       </header>
     </div>
   );

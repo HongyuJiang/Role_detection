@@ -86,7 +86,7 @@ class ClusterView extends React.Component {
         let startAngle = 10 * (pi/180);
         let endAngle = 170 * (pi/180);
         
-        userContainer.attr('transform', d => 'translate(' + (R * 0.7) + ',' + R + ')')
+        userContainer.attr('transform', d => 'translate(' + (R * 0.7) + ',' + (R) + ')')
 
         let angleScale = d3.scaleLinear().domain([0, person_num]).range([startAngle, endAngle])
 
@@ -235,14 +235,14 @@ class ClusterView extends React.Component {
 
         let zoom_lambda = width / 200
 
-        d3.select('#clusterContainer').selectAll('*').remove()
+        d3.select('#clusterContainer').selectAll('svg').remove()
 
         let canvas = d3.select('#clusterContainer').append('svg')
             .attr('width', width + 50)
             .attr('height', height + 50)
 
         const svg = canvas.append('g')
-            .attr('transform', 'translate(0,50)')
+            .attr('transform', 'translate(0,20)')
 
         let selecting = false
         let selected_persons = {}
@@ -343,9 +343,11 @@ class ClusterView extends React.Component {
     render() {
         return (
             <div id='clusterContainer' style={{
-                background: 'none', left: '20px', position: 'absolute', width: '35%', zIndex: '999', height: '55%', top: '20px',
+                background: 'none', left: '20px', position: 'absolute', width: '35%', zIndex: '999', height: '55%', top: '6%',
                 overflowY: 'auto'
             }}>
+
+                <div style={{ float:'left', marginLeft:'140px', width:'250px', height:'30px', background:'grey', fontSize:24, color:'white', borderRadius:'5px'}} > Traj Embedding Graph </div>
 
             </div>
         )

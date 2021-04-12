@@ -61,13 +61,15 @@ class GanttBot extends React.Component {
 
         let width = window.innerWidth
 
-        let height = 200
+        let height = 220
 
-        d3.select('#ganttContainer').selectAll('*').remove()
+        d3.select('#ganttContainer').selectAll('svg').remove()
 
         let canvas = d3.select('#ganttContainer').append('svg')
         .attr('width', width)
         .attr('height', height)
+        .append('g')
+        .attr('transform','translate(0, 20)')
 
         canvas.call(MyTip)
 
@@ -147,7 +149,7 @@ class GanttBot extends React.Component {
         .enter()
         .append('text')
         .attr('fill', 'black')
-        .attr('x', d => xScale(d.bt) + 10)
+        .attr('x', d => xScale(d.bt) + 15)
         .attr('y', 190)
         .attr('opacity', 1)
         .attr('font-size', 12)
@@ -201,8 +203,8 @@ class GanttBot extends React.Component {
 
     render() {
         return (
-            <div id='ganttContainer' style={{background:'rgba(255,255,255,1)', left:'0', bottom:'0', position:'absolute', height:'200px', zIndex:'999', width:'100%'}}>
-                
+            <div id='ganttContainer' style={{background:'rgba(255,255,255,1)', left:'0', bottom:'30px', position:'absolute', height:'250px', zIndex:'999', width:'100%'}}>
+                <div style={{ float:'right', marginRight:'20px', width:'200px', height:'30px', background:'grey', fontSize:24, color:'white', borderRadius:'5px'}} > Individual Gantt </div>
             </div>
         )
     }

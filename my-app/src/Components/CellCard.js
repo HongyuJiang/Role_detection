@@ -66,7 +66,7 @@ class CellCard extends React.Component {
 
         let canvas_height = shown_cell_list.length * 80 + 15
 
-        d3.select('#cardContainer').selectAll('*').remove()
+        d3.select('#cardContainer').selectAll('svg').remove()
 
         let canvas = d3.select('#cardContainer').append('svg')
         .attr('width', width)
@@ -117,7 +117,7 @@ class CellCard extends React.Component {
         .attr('y', d => 75 - sumScale(d.value))
         .attr('width', 8)
         .attr('height', d => sumScale(d.value))
-        .attr('fill', '#ff1c2d')
+        .attr('fill', 'steelblue')
         .attr('opacity', 0.3)
 
         cards.transition().duration(1200).attr('transform', (d,i) => {
@@ -128,9 +128,9 @@ class CellCard extends React.Component {
 
     render() {
         return (
-            <div id='cardContainer' style={{background:'rgba(255,255,255,0.9)', right:'0', position:'absolute', width:'320px', zIndex:'999', height:'70%', top:'20px', maxHeight: '1620px',
+            <div id='cardContainer' style={{background:'rgba(255,255,255,0.9)', right:'0', position:'absolute', width:'320px', zIndex:'999', height:'65%', top:'6%', maxHeight: '1620px',
             overflowY: 'auto'}}>
-                
+                <div style={{ float:'right', marginRight:'20px', width:'100px', height:'30px', background:'grey', fontSize:24, color:'white', borderRadius:'5px'}} > Cell List </div>
             </div>
         )
     }
